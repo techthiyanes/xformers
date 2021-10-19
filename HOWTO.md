@@ -11,6 +11,7 @@ Let's present here a couple of code snippets on how to solve a couple of questio
     - [Create complex sparsity patterns with xFormers](#create-complex-sparsity-patterns-with-xformers)
     - [Replace all attentions from an existing ViT model with a sparse equivalent ?](#replace-all-attentions-from-an-existing-vit-model-with-a-sparse-equivalent-)
     - [Some more examples](#some-more-examples)
+  - [BlockSparseAttention](#blocksparseattention)
   - [Extend the xFormers parts zoo locally](#extend-the-xformers-parts-zoo-locally)
   - [Contributing an extension to the xFormers repository](#contributing-an-extension-to-the-xformers-repository)
   - [Per component cherry picking](#per-component-cherry-picking)
@@ -65,7 +66,7 @@ Many helpers to generate 2d and 3d patterns are [available](xformers/components/
 
 ### How to use it ?
 
-There is nothing specific to be done, as long as you are using the normal `scaled_dot_product` attention ! As soon as it is called with a sparse enough mask (`density < 30%`), then the computations will be sparse.
+There is nothing specific to be done, as long as you are using the normal `scaled_dot_product` attention ! As soon as it is called with a sparse enough mask (`density < 30%`), then the computations will be sparse, thanks to a variant of the [Sputnik](https://github.com/google-research/sputnik) kernels.
 
 ```python
 import torch
@@ -186,6 +187,23 @@ Note that in practice exchanging all the attentions with a sparse alternative ma
 - on [changing ViT to use sparse attention and benchmarking the effects](docs/source/vision_transformers.ipynb)
 - on creating [complex sparsity patterns](docs/source/2d_attention_patterns.ipynb)
 - on a [SwinTransformers](docs/source/swin_transformers.ipynb)
+
+## BlockSparseAttention
+
+This uses the blocksparse computations which are provided by Triton out of the box. In xFormers, you can use the BlocksSparseAttention,
+which will limit the computations and the memory to the tiles specified in the `layout`:
+
+```python
+import torch
+from xformers.components.attention import BlockSparseAttention
+BLOCK_SIZE = 32     # for instance
+SEQ = 1024          # ..
+layout = torch.tril(torch.ones(SEQ//BLOCK_SIZE, SEQ//BLOCK_SIZE)).cuda()  # Only compute the lower triangular
+lower_tril_attention = BlockSparseAttention(layout=layout, block_size=BLOCK_SIZE, dropout=0.1)
+causal_mask = torch.tril(torch.ones(SEQ, SEQ)).bool().cuda()
+...
+att = lower_tril_attention(k, q, v, att_mask=causal_mask)
+```
 
 ## Extend the xFormers parts zoo locally
 

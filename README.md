@@ -48,7 +48,11 @@ There are two ways you can install it:
 
 #### Sparse attention kernels
 
-Installing the CUDA-based sparse attention kernels may require extra care, as this mobilizes the CUDA toolchain. As a reminder, these kernels are built when you run `pip install -e .` and the CUDA buildchain is available (NVCC compiler). Re-building can for instance be done via `python3 setup.py clean && python3 setup.py develop`, so similarly wipe the `build` folder and redo a pip install -e.
+Installing the CUDA-based sparse attention kernels (derived from [Sputnik](https://github.com/google-research/sputnik) \
+and [GE-SpMM](https://github.com/hgyhungry/ge-spmm)) may require extra care, as this mobilizes the CUDA toolchain.
+As a reminder, these kernels are built when you run `pip install -e .` and the CUDA buildchain is available (NVCC compiler).
+Re-building can for instance be done via `python3 setup.py clean && python3 setup.py develop`,
+or similarly wiping the `build` folder and redoing a `pip install -e .`
 
 Some advices related to building these CUDA-specific components, tentatively adressing common pitfalls. Please make sure that:
 
@@ -191,3 +195,13 @@ If you use xFormers in your publication, please cite it by using the following B
   year =         {2021}
 }
 ```
+
+## Credits
+
+The following repositories are used in xFormers, either in close to original form or as an inspiration:
+
+* [Sputnik](https://github.com/google-research/sputnik)
+* [GE-SpMM](https://github.com/hgyhungry/ge-spmm)
+* [Triton](https://github.com/openai/triton)
+* [LucidRain Reformer](https://github.com/lucidrains/reformer-pytorch)
+* [RevTorch](https://github.com/RobinBruegger/RevTorch)

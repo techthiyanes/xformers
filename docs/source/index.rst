@@ -7,7 +7,7 @@ They are interoperable and optimized building blocks, which can be optionally be
 to create some state of the art models.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Index
    :hidden:
 
@@ -17,7 +17,7 @@ to create some state of the art models.
 |
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Components Documentation
 
    components/index
@@ -26,7 +26,7 @@ to create some state of the art models.
 |
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Factory
 
    factory/index
@@ -45,9 +45,9 @@ to create some state of the art models.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Tools
+   :caption: Custom parts
 
-   triton/index
+   custom_parts/index
 
 |
 |

@@ -5,3 +5,4 @@ sphinxcontrib-programoutput==0.16
 git+https://github.com/pytorch/pytorch_sphinx_theme.git#egg=pytorch_sphinx_theme
 torch>=1.6.0
 numpy>=1.19.5
+triton >= 1.1.1
