@@ -8,7 +8,7 @@ to create some state of the art models.
 
 .. toctree::
    :maxdepth: 3
-   :caption: Index
+   :caption: Introduction
    :hidden:
 
    what_is_xformers
