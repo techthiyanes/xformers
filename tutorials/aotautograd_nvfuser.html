@@ -13,7 +13,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Triton components reference | xFormers 0.0.1 documentation</title>
+  <title>How to Enable Fused Operations Using AOTAutograd and NVFuser | xFormers 0.0.15 documentation</title>
   
   <script src="../_static/js/ga.js"></script>
   <script src="../_static/js/redirect.js"></script>
@@ -21,9 +21,9 @@
   <link rel="shortcut icon" href="../_static/images/favicon.png" />
   
   
-  <link rel="canonical" href="https://fairinternal.github.io/xformerstriton/index.html" />
+  <link rel="canonical" href="https://facebookresearch.github.io/xformerstutorials/aotautograd_nvfuser.html" />
   
-  <meta property="og:title" content="Triton components reference | xFormers 0.0.1 documentation">
+  <meta property="og:title" content="How to Enable Fused Operations Using AOTAutograd and NVFuser | xFormers 0.0.15 documentation">
   <meta name="description" content="API docs for xFormers. xFormers is a PyTorch extension library for composable and optimized Transformer blocks.">
   <meta property="og:description" content="API docs for xFormers. xFormers is a PyTorch extension library for composable and optimized Transformer blocks.">
   <!--<meta property="og:image" content="https://mmf.sh/img/logo.png">-->
@@ -43,8 +43,8 @@
   <link rel="stylesheet" href="../_static/css/customize.css" type="text/css" />
   <link rel="index" title="Index" href="../genindex.html" />
   <link rel="search" title="Search" href="../search.html" />
-  <link rel="next" title="Tools" href="../tools/index.html" />
-  <link rel="prev" title="Using Triton-based layers" href="../tutorials/triton.html" /> 
+  <link rel="next" title="Extend the xFormers parts zoo" href="extend_attentions.html" />
+  <link rel="prev" title="Using BlockSparseAttention" href="blocksparse.html" /> 
 
   
   <script src="../_static/js/modernizr.min.js"></script>
@@ -73,8 +73,8 @@
 <div class="container-fluid header-holder tutorials-header" id="header-holder">
   <div class="container">
     <div class="header-container">
-      <a class="header-logo" href="https://github.com/facebookresearch/xformers"><img src="_static/logo.png"
-          style="padding-right: 90px;" width="280px" height="53px"></a>
+      <a class="header-logo" href="https://github.com/facebookresearch/xformers"><img
+          src="../_static/logo.png" style="padding-right: 90px;" width="280px" height="53px"></a>
 
       <div class="main-menu">
         <ul>
@@ -136,29 +136,25 @@
         
         
         
-        <p><span class="caption-text">Index</span></p>
+        <p class="caption" role="heading"><span class="caption-text">Index</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../what_is_xformers.html">What is xFormers?</a></li>
 </ul>
-<p><span class="caption-text">Components Documentation</span></p>
+<p class="caption" role="heading"><span class="caption-text">Components Documentation</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../components/index.html">API Reference</a></li>
 </ul>
-<p><span class="caption-text">Factory</span></p>
+<p class="caption" role="heading"><span class="caption-text">Build models and blocks programatically</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../factory/index.html">Factory</a></li>
 </ul>
-<p><span class="caption-text">Tutorials</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials</a></li>
-</ul>
-<p><span class="caption-text">Tools</span></p>
+<p class="caption" role="heading"><span class="caption-text">Tutorials and examples</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Triton components reference</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Tutorials</a></li>
 </ul>
-<p><span class="caption-text">Tools</span></p>
+<p class="caption" role="heading"><span class="caption-text">Some custom parts</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../custom_parts/index.html">Custom parts reference</a></li>
 </ul>
 
         
@@ -199,13 +195,15 @@
       </li>
 
         
-      <li>Triton components reference</li>
+          <li><a href="index.html">Tutorials</a> &gt;</li>
+        
+      <li>How to Enable Fused Operations Using AOTAutograd and NVFuser</li>
     
     
       <li class="pytorch-breadcrumbs-aside">
         
             
-            <a href="../_sources/triton/index.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
+            <a href="../_sources/tutorials/aotautograd_nvfuser.rst.txt" rel="nofollow"><img src="../_static/images/view-page-source-icon.svg"></a>
           
         
       </li>
@@ -231,8 +229,24 @@
             <div role="main" class="main-content" itemscope="itemscope" itemtype="http://schema.org/Article">
               <article itemprop="articleBody" id="pytorch-article" class="pytorch-article">
                 
-  <section id="module-xformers.triton">
-<span id="triton-components-reference"></span><h1>Triton components reference<a class="headerlink" href="#module-xformers.triton" title="Permalink to this headline">¶</a></h1>
+  <section id="how-to-enable-fused-operations-using-aotautograd-and-nvfuser">
+<h1>How to Enable Fused Operations Using AOTAutograd and NVFuser<a class="headerlink" href="#how-to-enable-fused-operations-using-aotautograd-and-nvfuser" title="Permalink to this heading">¶</a></h1>
+<p>AOT Autograd is a toolkit from <a class="reference external" href="https://pytorch.org/functorch/stable/">FuncTorch</a> which can be used to accelerate model training in xFormers.
+Broadly, it extracts a computational graph of the forward and backward passes of a model ahead of time.
+This allows for some joint graph optimizations enables deep learning compilers such as <a class="reference external" href="https://github.com/pytorch/pytorch/blob/release/1.12/torch/csrc/jit/codegen/cuda/README.md">NVFuser</a> to perform operator fusion.
+The <a class="reference external" href="https://pytorch.org/functorch/stable/generated/functorch.compile.memory_efficient_fusion.html#functorch.compile.memory_efficient_fusion">memory_efficient_fusion</a> wrapper function provides a convenient way to leverage AOTAutograd and NVFuser on GPU.</p>
+<p>XFormers uses <cite>memory_efficient_fusion</cite> to combine sequences of fusable operations together into single fused function layers.
+These parts can be found inside <cite>xformers/components/nvfuser</cite>. A notable example is <cite>NVFusedBiasActivationDropout</cite>, which is readily used inside the <a class="reference external" href="https://github.com/facebookresearch/xformers/blob/main/xformers/components/feedforward/mlp.py">MLP</a> feedforward component.</p>
+<p>A benchmark of these fused patterns across some representative shapes shows significant speed increases compared to the unfused,
+Pytorch eager approach―up to 3.5x speedup for the forward pass and 2.2x for the forward and backward passes together. On average, peak memory usage of fused patterns is also lower,
+although we see some infrequent cases of up to 1.6x Pytorch peak memory usage on larger shapes. We also see better overall performance against our implementation of fused Bias,
+Activation, and Dropout using Triton (<a class="reference external" href="https://github.com/facebookresearch/xformers/blob/main/xformers/triton/dropout.py">see</a>) as well. Full benchmark plots can be found <a class="reference external" href="https://github.com/facebookresearch/xformers/tree/main/docs/plots/nvfuser">here</a>.</p>
+<p>Please note from README that the <cite>_is_functorch_available</cite> flag must be enabled for xFormers to use these optimizations.
+This allows the fused layers to be used and changes the behavior of the <cite>MLP</cite> feedforward component,
+causing it to default to using the fused <cite>NVFusedBiasActivationDropout</cite> layer.</p>
+<p>AOT Autograd offers a great deal a flexibility to the user, as <cite>memory_efficient_fusion</cite> can accept either a Python function or an entire <cite>nn.Module</cite> as input for fusion.
+Currently in xFormers, however, it is only used with Python function inputs because initial attempts with fusing xFormers layers and blocks have yielded memory issues and other CUDA errors.
+We are currently exploring further testing and benchmarking.</p>
 </section>
 
 
@@ -243,10 +257,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../tools/index.html" class="btn btn-neutral float-right" title="Tools" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
+        <a href="extend_attentions.html" class="btn btn-neutral float-right" title="Extend the xFormers parts zoo" accesskey="n" rel="next">Next <img src="../_static/images/chevron-right-orange.svg" class="next-page"></a>
       
       
-        <a href="../tutorials/triton.html" class="btn btn-neutral" title="Using Triton-based layers" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
+        <a href="blocksparse.html" class="btn btn-neutral" title="Using BlockSparseAttention" accesskey="p" rel="prev"><img src="../_static/images/chevron-right-orange.svg" class="previous-page"> Previous</a>
       
     </div>
   
@@ -259,7 +273,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2021, Facebook AI Research.
+        &copy; Copyright Copyright © 2021 Meta Platforms, Inc.
 
     </p>
   </div>
@@ -278,7 +292,7 @@
           <div class="pytorch-right-menu" id="pytorch-right-menu">
             <div class="pytorch-side-scroll" id="pytorch-side-scroll-right">
               <ul>
-<li><a class="reference internal" href="#">Triton components reference</a></li>
+<li><a class="reference internal" href="#">How to Enable Fused Operations Using AOTAutograd and NVFuser</a></li>
 </ul>
 
             </div>
@@ -295,10 +309,11 @@
   
   <script type="text/javascript" id="documentation_options" data-url_root="../"
     src="../_static/documentation_options.js"></script>
+  <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
   <script src="../_static/jquery.js"></script>
   <script src="../_static/underscore.js"></script>
+  <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
   <script src="../_static/doctools.js"></script>
-  <script src="../_static/language_data.js"></script>
   
 
   
@@ -336,6 +351,8 @@
             <li class="list-title"><a href="">Resources</a></li>
             <li><a href="https://github.com/facebookresearch/xformers">Docs</a></li>
             <li><a href="https://github.com/facebookresearch/xformers/issues" target="_blank">Github Issues</a></li>
+            <li><a href="https://opensource.facebook.com/legal/terms">Terms of Use</a></li>
+            <li><a href="https://opensource.facebook.com/legal/privacy">Privacy Policy</a></li>
           </ul>
         </div>
       </div>
